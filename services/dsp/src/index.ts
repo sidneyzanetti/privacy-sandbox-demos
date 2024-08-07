@@ -39,6 +39,8 @@ const {
   DSP_DETAIL,
   SSP_HOST,
   SHOP_HOST,
+  NEWS_HOST,
+  TRAVEL_HOST
 } = process.env;
 
 // in-memory storage for debug reports
@@ -115,6 +117,28 @@ app.get('/ads', async (req, res) => {
   registerSource.searchParams.append('id', id as string);
 
   res.render('ads.html.ejs', {title, move, creative, registerSource});
+});
+
+app.get('/static-ad.html', async (req, res) => {
+  const advertiser = SHOP_HOST;
+  const productId = "1f45e";
+
+  const PUBLISHER_IDS: { [hostname: string] : string; } = {};
+  PUBLISHER_IDS[`${NEWS_HOST}`] = "1000";
+  PUBLISHER_IDS[`${TRAVEL_HOST}`] = "2000";
+  
+  const referer = req.headers.referer || `https://${NEWS_HOST}/`;
+  const publisherHostname = new URL(referer.toString()).hostname;  
+  console.log('Loading frame content : ', {advertiser, productId, publisherHostname});
+
+  //get Publisher ID
+  const publisherId = PUBLISHER_IDS[publisherHostname] || "9999";
+
+  const title = `Your special ads from ${advertiser}`;
+  const move = new URL(`https://${advertiser}:${EXTERNAL_PORT}/items/${productId}`);
+  const creative = new URL(`https://${advertiser}:${EXTERNAL_PORT}/ads/${productId}`);
+  
+  res.render('static-ad.html.ejs', {title, move, creative, publisherId});
 });
 
 app.get('/join-ad-interest-group.html', async (req: Request, res: Response) => {
