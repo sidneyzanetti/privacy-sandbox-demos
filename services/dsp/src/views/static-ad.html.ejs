@@ -27,7 +27,17 @@
 </head>
 
 <body>
-  PUB_ID = <%= publisherId %>
+  <script>
+    const impressionContext = {
+      publisherId: "<%= publisherId %>",
+      publisherHostname: "<%= publisherHostname %>",
+      timestamp: Date.now(),
+    }
+
+    const valueToAppend = `|${JSON.stringify(impressionContext)}`;
+    window.sharedStorage.append('impressionContext', valueToAppend);
+  </script>
+
   <a width="300"
      height="250"
      target="_blank"
