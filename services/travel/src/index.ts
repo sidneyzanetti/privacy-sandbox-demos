@@ -16,7 +16,7 @@
 
 import express, {Application, Request, Response} from 'express';
 
-const {EXTERNAL_PORT, PORT, TRAVEL_TOKEN, TRAVEL_DETAIL, NEWS_HOST} =
+const {EXTERNAL_PORT, PORT, TRAVEL_TOKEN, TRAVEL_DETAIL, NEWS_HOST, DSP_HOST} =
   process.env;
 
 const app: Application = express();
@@ -38,6 +38,17 @@ app.get('/', async (req: Request, res: Response) => {
     EXTERNAL_PORT,
   };
   res.render('index', params);
+});
+
+app.get('/static-ad', async (req: Request, res: Response) => {
+  const title = TRAVEL_DETAIL;
+  const params = {
+    title,
+    TRAVEL_TOKEN,
+    DSP_HOST,
+    EXTERNAL_PORT,
+  };
+  res.render('static-ad', params);
 });
 
 app.listen(PORT, function () {
