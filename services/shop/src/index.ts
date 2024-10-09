@@ -213,11 +213,16 @@ app.get('/checkout', async (req: Request, res: Response) => {
   }, 0);
   const shipping = 40;
 
+  const DSP_MTA_CONVERSION_TAG_URL = new URL(
+    `https://${DSP_HOST}:${EXTERNAL_PORT}/js/mta-conversion-tag.js`,
+  );
+
   await req.session.destroy(() => Promise.resolve());
   res.render('checkout', {
     cart,
     subtotal,
     shipping,
+    DSP_MTA_CONVERSION_TAG_URL,
   });
 });
 

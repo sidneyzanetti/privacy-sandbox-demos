@@ -79,6 +79,17 @@ app.get('/video-ad', async (req: Request, res: Response) => {
   });
 });
 
+app.get('/static-ad', async (req: Request, res: Response) => {
+  res.render('static-ad', {
+    title: TITLE,
+    lorem: LOREM,
+    EXTERNAL_PORT,
+    HOME_HOST,
+    NEWS_TOKEN,
+    DSP_HOST,
+  });
+});
+
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);
 });

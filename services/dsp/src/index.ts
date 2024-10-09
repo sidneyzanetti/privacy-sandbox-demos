@@ -39,6 +39,11 @@ const {
   DSP_DETAIL,
   SSP_HOST,
   SHOP_HOST,
+  NEWS_HOST,
+  TRAVEL_HOST,
+  TOPICS_MOTO_HOST,
+  TOPICS_SOCCER_HOST,
+  TOPICS_GARDENING_HOST,
 } = process.env;
 
 // in-memory storage for debug reports
@@ -115,6 +120,61 @@ app.get('/ads', async (req, res) => {
   registerSource.searchParams.append('id', id as string);
 
   res.render('ads.html.ejs', {title, move, creative, registerSource});
+});
+
+// MTA variables
+const MTA_CAMPAIGN_ID = 1234;
+const PUBLISHER_IDS: {[hostname: string]: string} = {};
+PUBLISHER_IDS[`${NEWS_HOST}`] = '1000';
+PUBLISHER_IDS[`${TOPICS_MOTO_HOST}`] = '2000';
+PUBLISHER_IDS[`${TOPICS_SOCCER_HOST}`] = '3000';
+PUBLISHER_IDS[`${TOPICS_GARDENING_HOST}`] = '4000';
+
+app.get('/static-ad.html', async (req, res) => {
+  let getPublisherId = function () {
+    const referer = req.headers.referer || `https://${NEWS_HOST}/`;
+    const publisherHostname = new URL(referer.toString()).hostname || '';
+    return PUBLISHER_IDS[publisherHostname] || '9999';
+  };
+
+  let getAdDetails = function () {
+    const advertiser = SHOP_HOST;
+    const productId = '1f45e';
+    const campaignId = MTA_CAMPAIGN_ID;
+
+    const title = `Your special ads from ${advertiser}`;
+    const move = new URL(
+      `https://${advertiser}:${EXTERNAL_PORT}/items/${productId}`,
+    );
+    const creative = new URL(
+      `https://${advertiser}:${EXTERNAL_PORT}/ads/${productId}`,
+    );
+
+    return {advertiser, campaignId, title, move, creative};
+  };
+
+  const publisherId = getPublisherId();
+  const {advertiser, campaignId, title, move, creative} = getAdDetails();
+
+  console.log('Loading frame content : ', {
+    advertiser,
+    publisherId,
+  });
+
+  res.render('static-ad.html.ejs', {
+    title,
+    move,
+    creative,
+    publisherId,
+    campaignId,
+  });
+});
+
+app.get('/mta-conversion.html', (req, res) => {
+  const campaignId = MTA_CAMPAIGN_ID;
+  const budget = req.query.budget;
+  console.log(`Campaign Id: ${campaignId}, Budget: ${budget}`);
+  res.render('mta-conversion.html.ejs', {campaignId, budget});
 });
 
 app.get('/join-ad-interest-group.html', async (req: Request, res: Response) => {

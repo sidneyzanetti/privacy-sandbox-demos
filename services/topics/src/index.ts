@@ -16,9 +16,18 @@
 
 import express, {Application, Request, Response} from 'express';
 
-const {PORT, TOPICS_SERVER_HOST} = process.env;
+const {EXTERNAL_PORT, PORT, TOPICS_SERVER_HOST, DSP_HOST} = process.env;
 
 const app: Application = express();
+
+const LOREM =
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+const ICONS = {
+  'motorcycles': '#x1F3CD;',
+  'soccer': '#x26bd;',
+  'gardening': '#x1F333;',
+};
 
 app.use((req, res, next) => {
   next();
@@ -37,6 +46,22 @@ app.get('/', async (req: Request, res: Response) => {
     TOPICS_SERVER_HOST,
   };
   res.render('index', params);
+});
+
+app.get('/static-ad', async (req: Request, res: Response) => {
+  const hostname = req.hostname;
+  const title = hostname.substring(0, hostname.indexOf('.'));
+  const icon = ICONS[title as keyof typeof ICONS];
+
+  console.log('TITLE:' + title);
+  const params = {
+    title,
+    icon,
+    DSP_HOST,
+    EXTERNAL_PORT,
+    lorem: LOREM,
+  };
+  res.render('static-ad', params);
 });
 
 app.listen(PORT, async () => {
